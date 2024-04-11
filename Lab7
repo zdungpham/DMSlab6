@@ -1,0 +1,96 @@
+CREATE TABLE users(
+	id int IDENTITY(1,1) PRIMARY KEY,
+	name varchar(255),
+	address varchar(255),
+	dob DATE
+);
+
+CREATE TABLE contacts(
+	tel varchar(20) PRIMARY KEY,
+	name varchar(255),
+	address varchar(255),
+	dob DATE
+);
+
+CREATE TABLE user_contact(
+	user_id int FOREIGN KEY REFERENCES users(id),
+	contact_tel varchar(20) FOREIGN KEY REFERENCES contacts(tel)
+);
+DROP TABLE user_contact;
+DROP TABLE contacts;
+INSERT INTO users(name, address, dob)
+	VALUES('Nguyen Van Bo', '111 Xuan Dieu, Tay Ho, Ha Noi', '1993-08-11');
+
+INSERT INTO contacts(tel, name, dob)
+	VALUES('0987654321','Tran Van B','2009-12-12'),
+		  ('09873452','Chu Thi C','2004-12-19'),
+		  ('09832323','Khuong Hoan My','1999-04-13'),
+		  ('09434343','Ho Quynh Huong','1987-05-04'),
+		  ('123456789','Pham Nhat Vuong','1974-09-21'),
+		  ('768739491','Do Thanh Lam','1971-01-30');
+
+INSERT INTO contacts(tel, name, dob)
+	VALUES('0987654322','Nguyen D','2002-12-12'),
+		  ('09873453','Chu E','2002-11-18'),
+		  ('09832324','Khuong F','1998-03-12'),
+		  ('09434345','Ho G','1986-04-03'),
+		  ('123456783','Pham H','1973-08-20'),
+		  ('768739492','Do j','1970-12-29');
+
+INSERT INTO user_contact(user_id,contact_tel)
+	VALUES (2,'0987654322'),
+		  (2,'09873451'),
+		  (2,'09832322'),
+		  (2,'09434342'),
+		  (2,'123456783'),
+		  (2,'768739492'); 
+
+SELECT * FROM user_contact;
+--Cau 4:
+SELECT name FROM contacts;
+
+SELECT tel from contacts;
+
+
+--Cau 5:
+--a:
+SELECT * FROM contacts ORDER BY name asc;
+--b:
+SELECT * FROM contacts WHERE tel IN(SELECT contact_tel FROM user_contact 
+WHERE user_id IN (SELECT id FROM users WHERE name LIKE 'Nguyen Van An'));
+--c:
+SELECT name FROM contacts WHERE dob LIKE '2009-12-12';
+--Cau 6:
+--a:
+SELECT COUNT (*) as so_luong FROM contacts WHERE tel IN(SELECT contact_tel FROM user_contact 
+WHERE user_id IN (SELECT id FROM users WHERE name LIKE 'Nguyen Van An'));
+--b:
+SELECT COUNT(*) AS tong FROM contacts WHERE MONTH(dob) = 12;
+--c:
+SELECT * FROM contacts;
+--d:
+SELECT * FROM contacts WHERE tel LIKE '123456789';
+--Cau 7:
+--a:
+--b:
+--c:
+--Cau 8:
+--a:
+CREATE INDEX name_index ON contacts(name);
+CREATE INDEX tel_index ON contacts(tel);
+--b:
+CREATE VIEW SoDienThoai AS
+SELECT name as HOTEN, tel as SODIENTHOAI FROM contacts;
+SELECT * FROM Sinhnhat;
+CREATE VIEW SinhNhat AS
+SELECT name, dob, tel FROM contacts WHERE MONTH(dob) = 4;
+--c:
+CREATE PROCEDURE add_contact @tel varchar(20), @name varchar(255), @dob DATE AS
+INSERT INTO contacts(tel, name, dob)
+	VALUES(@tel, @name, @dob);
+
+CREATE PROCEDURE tim_danhba @name varchar(255) AS
+SELECT * FROM contacts WHERE name LIKE '%' + @name + '%';
+
+DROP PROCEDURE tim_danhba;
+EXECUTE tim_danhba @name = 'Nguy';
