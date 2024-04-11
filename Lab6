@@ -1,0 +1,40 @@
+CREATE TABLE prd_types(
+	id varchar(20) PRIMARY KEY,
+	name varchar(255),
+
+);
+
+CREATE TABLE managers(
+	id varchar(20) PRIMARY KEY,
+	name varchar(50)
+);
+
+CREATE TABLE products(
+	id varchar(20) PRIMARY KEY,
+	date date,
+	prd_types_id varchar(20) FOREIGN KEY REFERENCES prd_types(id),
+	manager_id varchar(20) FOREIGN KEY REFERENCES managers(id) 
+
+);
+
+INSERT prd_types(id, name)
+	VALUES('Z37E','May tinh sach tay Z37');
+
+INSERT managers(id, name)
+	VALUES('987688','Nguyen Van An');
+
+INSERT products(id, date, prd_types_id, manager_id)
+	VALUES('Z37 111111', '09-12-12', 'Z37E', '987688');
+
+SELECT * FROM products;
+
+--Cau7:
+--a:
+UPDATE products
+SET date = '2024-04-09'
+WHERE id = 'Z37 111111';
+
+
+--Cau 8:
+
+CREATE INDEX manager_name ON managers(name);
