@@ -1,0 +1,88 @@
+--Request 1:
+CREATE TABLE teachers(
+	id int PRIMARY KEY IDENTITY(1,1),
+	first_name varchar(50),
+	last_name varchar(50),
+	subject varchar(50)
+);
+
+CREATE TABLE classes (
+	id int PRIMARY KEY IDENTITY(1,1),
+	class_name varchar(50),
+	teacher_id int FOREIGN KEY REFERENCES teachers(id)
+);
+
+CREATE TABLE students(
+	id int PRIMARY KEY IDENTITY(1,1),
+	first_name varchar(50),
+	last_name varchar (50),
+	birth_date DATE,
+	class_id int FOREIGN KEY REFERENCES classes(id)
+);
+
+--Request 2:
+INSERT INTO teachers(first_name, last_name, subject)
+	VALUES('Quan', 'Nguyen', 'Math'),
+	('Tien', 'Tran', 'Music'),
+	('Hang', 'Do', 'English');
+
+INSERT INTO classes(class_name, teacher_id)
+	VALUES('B01','1'),
+      	('B02','2'),
+      	('B03','3'),
+      	('B04','2'),
+      	('B05','3');
+
+INSERT INTO students(first_name, last_name, birth_date, class_id)
+	VALUES('Dung','Pham','1999-12-16','1'),
+	      ('Dat','Tran','1998-04-13','2'),
+      	('Huyen','Cong','2000-05-21','3'),
+      	('Kien','Nguyen','2002-11-30','4'),
+      	('Thien','Hao','1989-08-29','5'),
+      	('Hue','Do','2005-01-31','3'),
+      	('An','Nguyen','2002-09-02','2'),
+      	('Hang','Tran','1997-03-08','5'),
+      	('Lan','Pham','2003-02-20','1'),
+      	('Toan','Phung','2001-07-18','4');
+
+--Request 3:
+SELECT students.id, students.first_name AS student_first_name, students.last_name AS student_last_name, classes.class_name, teachers.first_name AS teacher_first_name, teachers.last_name AS teacher_last_name  FROM students 
+INNER JOIN classes ON students.class_id = classes.id
+INNER JOIN teachers ON classes.teacher_id = teachers.id;
+
+--Request 4:
+SELECT * FROM students WHERE birth_date >= '2000-01-01';
+
+--Request 5:
+SELECT students.id, students.first_name AS student_first_name, students.last_name AS student_last_name, classes.class_name, teachers.first_name AS teacher_first_name, teachers.last_name AS teacher_last_name  FROM students 
+INNER JOIN classes ON students.class_id = classes.id
+INNER JOIN teachers ON classes.teacher_id = teachers.id 
+ORDER BY student_first_name, student_last_name asc;
+
+--Request 6:
+UPDATE students 
+SET first_name = 'John', last_name = 'Doe'
+WHERE id = 3;
+
+--Request 7:
+DELETE students
+WHERE id = 7;
+
+--Request 8:
+CREATE PROCEDURE GetStudentsByClassAndSubject @id int, @subject varchar(50) AS
+BEGIN
+	SELECT * FROM students WHERE class_id IN(SELECT id FROM classes WHERE id = @id) AND 
+	class_id IN(SELECT id FROM classes WHERE teacher_id IN(SELECT id FROM teachers WHERE subject = @subject));
+END;
+
+EXECUTE GetStudentsByClassAndSubject @id = 2, @subject = 'Music';
+
+DROP PROCEDURE GetStudentsByClassAndSubject;
+
+--Request 9:
+CREATE VIEW  StudentsWithClassAndTeacher AS
+SELECT students.id, students.birth_date AS date_of_birth, students.first_name AS student_first_name, students.last_name AS student_last_name, classes.class_name, teachers.first_name AS teacher_first_name, teachers.last_name AS teacher_last_name, teachers.subject FROM students 
+INNER JOIN classes ON students.class_id = classes.id
+INNER JOIN teachers ON classes.teacher_id = teachers.id;
+
+SELECT * FROM StudentsWithClassAndTeacher;
